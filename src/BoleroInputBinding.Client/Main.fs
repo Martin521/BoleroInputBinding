@@ -51,6 +51,7 @@ type Message =
     | Increment
     | Decrement
     | SetCounter of int
+    | SetInput of string
     | ResetInput
     | SetLabel of string
     | GetBooks
@@ -70,8 +71,10 @@ let update (http: HttpClient) message model =
     | SetCounter value ->
         { model with counter = value }, Cmd.none
     
+    | SetInput s ->
+        { model with inputString = s; label = s.ToUpper()}, Cmd.none
     | ResetInput ->
-        { model with inputString = ""}, Cmd.none
+        model, Cmd.ofMsg (SetInput "")
     | SetLabel s ->
         { model with label = s}, Cmd.none
 
@@ -159,7 +162,7 @@ let inputPage model dispatch =
                 attr.``type`` "text"
                 attr.id "textInput"
                 attr.``class`` "input"
-                bind.input.string model.inputString (fun v -> dispatch (SetLabel (v.ToUpper())))
+                bind.input.string model.inputString (fun v -> dispatch (SetInput v))
             ]
         ]
         p [] [
